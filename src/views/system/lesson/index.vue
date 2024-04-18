@@ -186,9 +186,6 @@ export default {
     this.getClassList()
   },
   methods: {
-    handleSelect(row) {
-      this.$router.push(`/questionList/${row.lessonId}`)
-    },
     getClassList() {
       listAllClass().then(response => {
         this.classList = response

@@ -149,6 +149,20 @@ export const dynamicRoutes = [
     ]
   },
   {
+    path: '/system/doQuestion',
+    component: Layout,
+    hidden: true,
+    roles: ['student', 'admin', 'teacher'],
+    children: [
+      {
+        path: 'index/:questionId(\\d+)',
+        component: () => import('@/views/system/question/doQuestion.vue'),
+        name: 'DoQuestion',
+        meta: { title: '做题页面', activeMenu: '/lesson' }
+      }
+    ]
+  },
+  {
     path: '/monitor/job-log',
     component: Layout,
     hidden: true,

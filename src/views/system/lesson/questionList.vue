@@ -88,7 +88,7 @@
           <el-tag type="danger" v-else>困难</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="所属题目" align="center" prop="lesson.name">
+      <el-table-column label="所属课程" align="center" prop="lesson.name">
         <template slot-scope="scope">
           <el-link type="primary" @click="">{{ scope.row.lesson.name }}</el-link>
         </template>
@@ -96,22 +96,9 @@
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:question:edit']"
-          >修改
-          </el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['system:question:remove']"
-          >删除
-          </el-button>
+          <router-link :to="'/system/doQuestion/index/' + scope.row.questionId" class="link-type">
+            <el-link>进入做题</el-link>
+          </router-link>
         </template>
       </el-table-column>
     </el-table>
@@ -223,10 +210,8 @@ export default {
     this.getList()
   },
   methods: {
-    getQuestionListByLessonId(lessonId) {
-      selectOjQuestionListByLessonId(lessonId).then(response => {
-        this.questionList = response
-      })
+    goDoQuestionPage() {
+
     },
     getList() {
       this.loading = true
