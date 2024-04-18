@@ -9,13 +9,15 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="题目难度等级" prop="difficultyLevel">
-        <el-input
-          v-model="queryParams.difficultyLevel"
-          placeholder="请输入题目难度等级"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
+      <el-form-item label="难度等级" prop="difficultyLevel">
+        <el-select v-model="queryParams.difficultyLevel" placeholder="请选择难度等级">
+          <el-option
+            v-for="dict in dict.type.question_difficulty_level"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          ></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
@@ -166,7 +168,14 @@
 </template>
 
 <script>
-import { listQuestion, getQuestion, delQuestion, addQuestion, updateQuestion } from '@/api/system/question'
+import {
+  listQuestion,
+  getQuestion,
+  delQuestion,
+  addQuestion,
+  updateQuestion,
+  selectOjQuestionListByLessonId
+} from '@/api/system/question'
 import { listAllLesson } from '@/api/system/lesson'
 
 export default {
@@ -174,6 +183,7 @@ export default {
   name: 'Question',
   data() {
     return {
+      lessonId: null,
       lessonList: [],
       // 遮罩层
       loading: true,
@@ -209,16 +219,15 @@ export default {
     }
   },
   created() {
+    this.queryParams.questionId = (this.$route.params.lessonId)
     this.getList()
-    this.getAllLesson()
   },
   methods: {
-    getAllLesson() {
-      listAllLesson().then(response => {
-        this.lessonList = response
+    getQuestionListByLessonId(lessonId) {
+      selectOjQuestionListByLessonId(lessonId).then(response => {
+        this.questionList = response
       })
     },
-    /** 查询题目管理列表 */
     getList() {
       this.loading = true
       listQuestion(this.queryParams).then(response => {

@@ -9,6 +9,14 @@ export function listQuestion(query) {
   })
 }
 
+// 根据课程id查询题目列表
+export function selectOjQuestionListByLessonId(lessonId) {
+  return request({
+    url: '/system/question/selectOjQuestionListByLessonId/' + lessonId,
+    method: 'get'
+  })
+}
+
 // 查询题目管理列表
 export function listAllQuestion() {
   return request({
