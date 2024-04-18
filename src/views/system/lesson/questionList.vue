@@ -1,10 +1,18 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="课程名称" prop="name">
+      <el-form-item label="题目名称" prop="name">
         <el-input
           v-model="queryParams.name"
-          placeholder="请输入课程名称"
+          placeholder="请输入题目名称"
+          clearable
+          @keyup.enter.native="handleQuery"
+        />
+      </el-form-item>
+      <el-form-item label="题目难度等级" prop="difficultyLevel">
+        <el-input
+          v-model="queryParams.difficultyLevel"
+          placeholder="请输入题目难度等级"
           clearable
           @keyup.enter.native="handleQuery"
         />
@@ -23,7 +31,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:lesson:add']"
+          v-hasPermi="['system:question:add']"
         >新增
         </el-button>
       </el-col>
@@ -35,7 +43,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:lesson:edit']"
+          v-hasPermi="['system:question:edit']"
         >修改
         </el-button>
       </el-col>
@@ -47,7 +55,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:lesson:remove']"
+          v-hasPermi="['system:question:remove']"
         >删除
         </el-button>
       </el-col>
@@ -58,27 +66,29 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:lesson:export']"
+          v-hasPermi="['system:question:export']"
         >导出
         </el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="lessonList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" :data="questionList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="课程id" align="center" prop="lessonId"/>
-      <el-table-column label="课程名称" align="center" prop="name" :show-overflow-tooltip="true">
+      <el-table-column label="题目id" align="center" prop="questionId"/>
+      <el-table-column label="题目名称" align="center" prop="name"/>
+      <el-table-column label="题目描述" align="center" prop="description"/>
+      <el-table-column label="模板内容" align="center" prop="template"/>
+      <el-table-column label="题目难度等级" align="center" prop="difficultyLevel">
         <template slot-scope="scope">
-          <router-link :to="'/system/lesson-questionList/index/' + scope.row.lessonId" class="link-type">
-            <span>{{ scope.row.name }}</span>
-          </router-link>
+          <el-tag type="success" v-if="scope.row.difficultyLevel === 'easy'">简单</el-tag>
+          <el-tag type="warning" v-else-if="scope.row.difficultyLevel === 'middle'">中等</el-tag>
+          <el-tag type="danger" v-else>困难</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="课程描述" align="center" prop="description"/>
-      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+      <el-table-column label="所属题目" align="center" prop="lesson.name">
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+          <el-link type="primary" @click="">{{ scope.row.lesson.name }}</el-link>
         </template>
       </el-table-column>
       <el-table-column label="备注" align="center" prop="remark"/>
@@ -89,16 +99,15 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:lesson:edit']"
+            v-hasPermi="['system:question:edit']"
           >修改
           </el-button>
-
           <el-button
             size="mini"
             type="text"
             icon="el-icon-delete"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:lesson:remove']"
+            v-hasPermi="['system:question:remove']"
           >删除
           </el-button>
         </template>
@@ -113,21 +122,37 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改课程管理对话框 -->
+    <!-- 添加或修改题目管理对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="课程名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入课程名称"/>
+        <el-form-item label="题目名称" prop="name">
+          <el-input v-model="form.name" placeholder="请输入题目名称"/>
         </el-form-item>
-        <el-form-item label="课程描述" prop="description">
+        <el-form-item label="题目描述" prop="description">
           <el-input v-model="form.description" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
-        <el-form-item label="所属班级" prop="description">
-          <el-select v-model="form.classIds" multiple placeholder="请选择所属班级">
-            <el-option v-for="(item) in classList" :label="item.className" :value="item.classId" :key="item.classId">
+        <el-form-item label="模板内容" prop="template">
+          <el-input v-model="form.template" type="textarea" placeholder="请输入内容"/>
+        </el-form-item>
+        <el-form-item label="难度等级" prop="difficultyLevel">
+          <el-select v-model="form.difficultyLevel" placeholder="请选择题目难度等级">
+            <el-option
+              v-for="dict in dict.type.question_difficulty_level"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="所属课程" prop="lessonIds">
+          <el-select v-model="form.lessonId" placeholder="请选择所属课程">
+            <el-option v-for="(item) in lessonList" :label="item.name" :value="item.lessonId"
+                       :key="item.lessonId"
+            >
             </el-option>
           </el-select>
         </el-form-item>
+
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容"/>
         </el-form-item>
@@ -141,15 +166,15 @@
 </template>
 
 <script>
-import { listLesson, getLesson, delLesson, addLesson, updateLesson } from '@/api/system/lesson'
-import { listAllClass } from '@/api/system/class'
+import { listQuestion, getQuestion, delQuestion, addQuestion, updateQuestion } from '@/api/system/question'
+import { listAllLesson } from '@/api/system/lesson'
 
 export default {
-  name: 'Lesson',
+  dicts: ['question_difficulty_level'],
+  name: 'Question',
   data() {
     return {
-      // 所有班级
-      classList: [],
+      lessonList: [],
       // 遮罩层
       loading: true,
       // 选中数组
@@ -162,8 +187,8 @@ export default {
       showSearch: true,
       // 总条数
       total: 0,
-      // 课程管理表格数据
-      lessonList: [],
+      // 题目管理表格数据
+      questionList: [],
       // 弹出层标题
       title: '',
       // 是否显示弹出层
@@ -173,7 +198,9 @@ export default {
         pageNum: 1,
         pageSize: 10,
         name: null,
-        description: null
+        description: null,
+        template: null,
+        difficultyLevel: null
       },
       // 表单参数
       form: {},
@@ -183,23 +210,19 @@ export default {
   },
   created() {
     this.getList()
-    this.getClassList()
+    this.getAllLesson()
   },
   methods: {
-    handleSelect(row) {
-      this.$router.push(`/questionList/${row.lessonId}`)
-    },
-    getClassList() {
-      listAllClass().then(response => {
-        this.classList = response
-        // this.classList = response.data
+    getAllLesson() {
+      listAllLesson().then(response => {
+        this.lessonList = response
       })
     },
-    /** 查询课程管理列表 */
+    /** 查询题目管理列表 */
     getList() {
       this.loading = true
-      listLesson(this.queryParams).then(response => {
-        this.lessonList = response.rows
+      listQuestion(this.queryParams).then(response => {
+        this.questionList = response.rows
         this.total = response.total
         this.loading = false
       })
@@ -212,9 +235,11 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        lessonId: null,
+        questionId: null,
         name: null,
         description: null,
+        template: null,
+        difficultyLevel: null,
         delFlag: null,
         createBy: null,
         createTime: null,
@@ -236,7 +261,7 @@ export default {
     },
     // 多选框选中数据
     handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.lessonId)
+      this.ids = selection.map(item => item.questionId)
       this.single = selection.length !== 1
       this.multiple = !selection.length
     },
@@ -244,30 +269,30 @@ export default {
     handleAdd() {
       this.reset()
       this.open = true
-      this.title = '添加课程管理'
+      this.title = '添加题目管理'
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset()
-      const lessonId = row.lessonId || this.ids
-      getLesson(lessonId).then(response => {
+      const questionId = row.questionId || this.ids
+      getQuestion(questionId).then(response => {
         this.form = response.data
         this.open = true
-        this.title = '修改课程管理'
+        this.title = '修改题目管理'
       })
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs['form'].validate(valid => {
         if (valid) {
-          if (this.form.lessonId != null) {
-            updateLesson(this.form).then(response => {
+          if (this.form.questionId != null) {
+            updateQuestion(this.form).then(response => {
               this.$modal.msgSuccess('修改成功')
               this.open = false
               this.getList()
             })
           } else {
-            addLesson(this.form).then(response => {
+            addQuestion(this.form).then(response => {
               this.$modal.msgSuccess('新增成功')
               this.open = false
               this.getList()
@@ -278,9 +303,9 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const lessonIds = row.lessonId || this.ids
-      this.$modal.confirm('是否确认删除课程管理编号为"' + lessonIds + '"的数据项？').then(function() {
-        return delLesson(lessonIds)
+      const questionIds = row.questionId || this.ids
+      this.$modal.confirm('是否确认删除题目管理编号为"' + questionIds + '"的数据项？').then(function() {
+        return delQuestion(questionIds)
       }).then(() => {
         this.getList()
         this.$modal.msgSuccess('删除成功')
@@ -289,9 +314,9 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport() {
-      this.download('system/lesson/export', {
+      this.download('system/question/export', {
         ...this.queryParams
-      }, `lesson_${new Date().getTime()}.xlsx`)
+      }, `question_${new Date().getTime()}.xlsx`)
     }
   }
 }
