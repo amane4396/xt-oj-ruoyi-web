@@ -30,7 +30,7 @@
 
         <CodeEditor v-model="code" language="go"></CodeEditor>
         <br>
-        <el-button type="primary"><i class="el-icon-caret-right" style="margin-right: 5px"></i>运行</el-button>
+        <el-button type="primary" @click="submitCode"><i class="el-icon-caret-right" style="margin-right: 5px"></i>运行</el-button>
         <el-button type="primary"><i class="el-icon-upload" style="margin-right: 5px"></i>提交</el-button>
         <el-button @click="drawer = true" style="float: right;margin-right: 20px">
           提交记录
@@ -40,8 +40,8 @@
             title="我是标题"
             :visible.sync="drawer"
             :with-header="false">
-          <div style="padding-left: 20px;padding-top: 20px">
-            <span>{{code}}</span>
+          <div style="padding-left: 20px;padding-top: 20px;height: 750px">
+            <CodeEditor v-model="code" language="go"></CodeEditor>
           </div>
         </el-drawer>
       </div>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { listQuestion, getQuestion, delQuestion, addQuestion, updateQuestion } from '@/api/system/question'
+import { listQuestion, getQuestion, delQuestion, addQuestion, updateQuestion,submit } from '@/api/system/question'
 import CodeEditor from '@/components/CodeEditor/CodeEditor.vue'
 
 export default {
@@ -61,7 +61,18 @@ export default {
   data() {
     return {
       question: {},
-      code:"type user struct",
+      code:
+      'class Solution {\n' +
+          '    public static String solution(String str){\n' +
+          '    return new StringBuilder(str).reverse().toString();\n' +
+          '    }\n' +
+          '    \n' +
+          '    public static void main(String[] args\n' +
+          '    {\n' +
+          '    String s = "as";\n' +
+          '    System.out.println(solution(s));\n' +
+          '    }\n' +
+          '}',
       drawer: false,
 
     }
@@ -74,9 +85,21 @@ export default {
       getQuestion(this.$route.params.questionId).then(response => {
         this.question = response.data
       })
+    },
+    submitCode() {
+
+      const escapedCode = this.code.replace(/"/g, '\\"')
+      console.log(escapedCode)
+      submit({ code: escapedCode }).then(response => {
+        console.log(response);
+      }).catch(error => {
+        console.error('提交代码时出错:', error);
+      });
+
     }
   }
 }
+
 </script>
 
 

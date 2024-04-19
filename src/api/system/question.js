@@ -58,3 +58,13 @@ export function delQuestion(questionId) {
     method: 'delete'
   })
 }
+
+
+// 删除题目管理
+export function submit(data) {
+  return request({
+    url: '/system/submitLog/runCode',
+    method: 'post',
+    data: data
+  })
+}
