@@ -41,7 +41,7 @@
             :visible.sync="drawer"
             :with-header="false">
           <div style="padding-left: 20px;padding-top: 20px;height: 750px">
-            <CodeEditor v-model="code" language="go"></CodeEditor>
+            <CodeEditor v-model="code" language="java"></CodeEditor>
           </div>
         </el-drawer>
       </div>
@@ -87,7 +87,6 @@ export default {
       })
     },
     submitCode() {
-
       const escapedCode = this.code.replace(/"/g, '\\"')
       console.log(escapedCode)
       submit({ code: escapedCode }).then(response => {

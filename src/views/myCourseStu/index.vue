@@ -17,11 +17,6 @@
 
     <el-table v-loading="loading" :data="lessonList" @selection-change="handleSelectionChange">
       <el-table-column label="课程名称" align="center" prop="name" :show-overflow-tooltip="true">
-        <template slot-scope="scope">
-          <router-link :to="'/system/lesson-homeworkManage/index/' + scope.row.lessonId" class="link-type">
-            <span>{{ scope.row.name }}</span>
-          </router-link>
-        </template>
       </el-table-column>
       <el-table-column label="课程描述" align="center" prop="description"/>
       <el-table-column label="创建时间" align="center" prop="createTime" width="180">
@@ -32,10 +27,7 @@
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <router-link :to="'/system/lesson-homeworkManage/index/' + scope.row.lessonId" class="link-type">
-            <el-link type="primary">作业管理</el-link>
-          </router-link>
-          <router-link :to="'/system/lesson-homeworkManage/index/' + scope.row.lessonId" class="link-type">
+          <router-link :to="'/system/listHomeWork/index/' + scope.row.lessonId" class="link-type">
             <el-link type="primary">查看作业</el-link>
           </router-link>
         </template>
@@ -78,7 +70,7 @@
 </template>
 
 <script>
-import { listLesson, getLesson, delLesson, addLesson, updateLesson, listLessonByTeacher } from '@/api/system/lesson'
+import { listLesson, getLesson, delLesson, addLesson, updateLesson, getLessonByStudentId } from '@/api/system/lesson'
 import { listAllClass } from '@/api/system/class'
 
 export default {
@@ -132,7 +124,7 @@ export default {
     /** 查询课程管理列表 */
     getList() {
       this.loading = true
-      listLessonByTeacher().then(response => {
+      getLessonByStudentId().then(response => {
         this.lessonList = response
         this.loading = false
       })

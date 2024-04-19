@@ -25,6 +25,14 @@ export function getHomework(homeworkId) {
   })
 }
 
+// 查询作业管理详细
+export function getById(homeworkId) {
+  return request({
+    url: '/system/homework/getById/' + homeworkId,
+    method: 'get'
+  })
+}
+
 // 新增作业管理
 export function addHomework(data) {
   return request({

@@ -25,6 +25,14 @@ export function listLessonByTeacher() {
   })
 }
 
+// 查询课程管理列表
+export function getLessonByStudentId() {
+  return request({
+    url: '/system/lesson/getLessonByStudentId',
+    method: 'get',
+  })
+}
+
 
 
 // 查询课程管理详细

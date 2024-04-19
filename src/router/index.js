@@ -149,6 +149,20 @@ export const dynamicRoutes = [
     ]
   },
   {
+    path: '/system/listHomeWork',
+    component: Layout,
+    hidden: true,
+    roles: ['admin', 'student'],
+    children: [
+      {
+        path: 'index/:lessonId(\\d+)',
+        component: () => import('@/views/myCourseStu/listHomework.vue'),
+        name: 'ListHomework',
+        meta: { title: '查看作业', activeMenu: '/myCourseStu' }
+      }
+    ]
+  },
+  {
     path: '/system/doQuestion',
     component: Layout,
     hidden: true,
