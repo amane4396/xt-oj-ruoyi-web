@@ -9,6 +9,14 @@ export function listStudent(query) {
   })
 }
 
+// 查询学生管理列表
+export function listByLessonId(lessonId) {
+  return request({
+    url: `/oj/student/listByLessonId/${lessonId}`,
+    method: 'get'
+  })
+}
+
 // 查询学生管理详细
 export function getStudent(studentId) {
   return request({

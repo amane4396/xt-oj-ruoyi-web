@@ -15,62 +15,10 @@
       </el-form-item>
     </el-form>
 
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['system:lesson:add']"
-        >新增
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
-          size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['system:lesson:edit']"
-        >修改
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['system:lesson:remove']"
-        >删除
-        </el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['system:lesson:export']"
-        >导出
-        </el-button>
-      </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
-    </el-row>
-
     <el-table v-loading="loading" :data="lessonList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center"/>
-      <el-table-column label="课程id" align="center" prop="lessonId"/>
       <el-table-column label="课程名称" align="center" prop="name" :show-overflow-tooltip="true">
         <template slot-scope="scope">
-          <router-link :to="'/system/lesson-questionList/index/' + scope.row.lessonId" class="link-type">
+          <router-link :to="'/system/lesson-homeworkManage/index/' + scope.row.lessonId" class="link-type">
             <span>{{ scope.row.name }}</span>
           </router-link>
         </template>
@@ -84,23 +32,9 @@
       <el-table-column label="备注" align="center" prop="remark"/>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:lesson:edit']"
-          >作业管理
-          </el-button>
-
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['system:lesson:remove']"
-          >查看作业
-          </el-button>
+          <router-link :to="'/system/lesson-homeworkManage/index/' + scope.row.lessonId" class="link-type">
+            <el-link type="primary">作业管理</el-link>
+          </router-link>
         </template>
       </el-table-column>
     </el-table>
@@ -141,7 +75,7 @@
 </template>
 
 <script>
-import { listLesson, getLesson, delLesson, addLesson, updateLesson } from '@/api/system/lesson'
+import { listLesson, getLesson, delLesson, addLesson, updateLesson, listLessonByTeacher } from '@/api/system/lesson'
 import { listAllClass } from '@/api/system/class'
 
 export default {
@@ -195,9 +129,8 @@ export default {
     /** 查询课程管理列表 */
     getList() {
       this.loading = true
-      listLesson(this.queryParams).then(response => {
-        this.lessonList = response.rows
-        this.total = response.total
+      listLessonByTeacher().then(response => {
+        this.lessonList = response
         this.loading = false
       })
     },

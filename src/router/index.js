@@ -135,16 +135,16 @@ export const dynamicRoutes = [
     ]
   },
   {
-    path: '/system/lesson-questionList',
+    path: '/system/lesson-homeworkManage',
     component: Layout,
     hidden: true,
-    roles: ['student', 'admin', 'teacher'],
+    roles: ['admin', 'teacher'],
     children: [
       {
         path: 'index/:lessonId(\\d+)',
-        component: () => import('@/views/system/lesson/questionList.vue'),
+        component: () => import('@/views/system/homework/homeworkManage.vue'),
         name: 'QuestionList',
-        meta: { title: '题目列表', activeMenu: '/lesson' }
+        meta: { title: '作业管理', activeMenu: '/myCourse' }
       }
     ]
   },
