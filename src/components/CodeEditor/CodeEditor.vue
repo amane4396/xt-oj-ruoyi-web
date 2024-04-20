@@ -1,89 +1,69 @@
 <template>
-  <div ref="main" style="width: 100%; height: 100%"></div>
+  <div
+    ref="container"
+    class="monaco-editor"
+    :style="`height: ${height}px`"
+  ></div>
 </template>
-
 <script>
-import * as monaco from "monaco-editor";
-// 引入自定义提示词
-import pythonSuggestion from "@/components/CodeEditor/python-suggest";
-import goSuggestion from "@/components/CodeEditor/go-suggestion";
-const customLanguage={
-  "go":goSuggestion,
-  "python":pythonSuggestion
-}
+import * as monaco from 'monaco-editor'
+
 export default {
-  name:"CodeEditor",
+  name: 'AcMonaco',
+  props: {
+    opts: {
+      type: Object,
+      default() {
+        return {}
+      }
+    },
+    height: {
+      type: Number,
+      default: 300
+    }
+  },
   data() {
     return {
-      monacoEditor: null,
-    };
+      // 主要配置
+      defaultOpts: {
+        value: '', // 编辑器的值
+        theme: 'vs-dark', // 编辑器主题
+        roundedSelection: true, // 右侧不显示编辑器预览框
+        autoIndent: true // 自动缩进
+      },
+      // 编辑器对象
+      monacoEditor: {}
+    }
   },
-  props:{
-    language:String,
-    value:String
-  },
-  created() {
-
-  },
-  watch:{
-    value(newCode) {
-      this.monacoEditor.setValue(newCode);
+  watch: {
+    opts: {
+      handler() {
+        this.init()
+      },
+      deep: true
     }
   },
   mounted() {
-    this.$nextTick(()=>{
-      this.initMonaco();
-      // 自定义提示词
-      this.initCustomLanguage();
-    })
+    this.init()
   },
   methods: {
-    initMonaco() {
-      this.monacoEditor = monaco.editor.create(this.$refs.main, {
-        theme: "vs-dark", // 主题
-        value: this.value, // 默认显示的值
-        language: this.language,
-        folding: true, // 是否折叠
-        foldingHighlight: true, // 折叠等高线
-        foldingStrategy: "auto", // 折叠方式
-        showFoldingControls: "always", // 是否一直显示折叠
-        disableLayerHinting: true, // 等宽优化
-        emptySelectionClipboard: false, // 空选择剪切板
-        selectionClipboard: false, // 选择剪切板
-        automaticLayout: true, // 自动布局
-        codeLens: true, // 代码镜头
-        scrollBeyondLastLine: false, // 滚动完最后一行后再滚动一屏幕
-        colorDecorators: true, // 颜色装饰器
-        accessibilitySupport: "on", // 辅助功能支持"auto" | "off" | "on"
-        lineNumbers: "on", // 行号 取值： "on" | "off" | "relative" | "interval" | function
-        lineNumbersMinChars: 4, // 行号最小字符   number
-        enableSplitViewResizing: false,
-        readOnly: false, //是否只读  取值 true | false
-        fontSize:18
-      });
+    init() {
+      // 初始化container的内容，销毁之前生成的编辑器
+      this.$refs.container.innerHTML = ''
+      // 生成编辑器配置
+      let editorOptions = Object.assign(this.defaultOpts, this.opts)
+      // 生成编辑器对象
+      this.monacoEditor = monaco.editor.create(this.$refs.container, editorOptions)
+      // 编辑器内容发生改变时触发
       this.monacoEditor.onDidChangeModelContent(() => {
-        this.$emit('change', this.monacoEditor.getValue());
-      });
+        this.$emit('change', this.monacoEditor.getValue())
+      })
     },
-    initCustomLanguage(){
-      let language=this.language;
-      if(!(Object.keys(customLanguage)).includes(this.language)){
-        return
-      }
-      monaco.languages.registerCompletionItemProvider(this.language, {
-        provideCompletionItems: function() {
-          let keywords = customLanguage[language];
-          let suggestions = keywords.map(function(keyword) {
-            return {
-              label: keyword,
-              kind: monaco.languages.CompletionItemKind.Keyword,
-              insertText: keyword
-            };
-          });
-          return { suggestions: suggestions };
-        }
-      });
-    },
-  },
-};
+    // 供父组件调用手动获取值
+    getVal() {
+      return this.monacoEditor.getValue()
+    }
+  }
+}
 </script>
+

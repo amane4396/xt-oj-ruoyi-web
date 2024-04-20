@@ -60,10 +60,20 @@ export function delQuestion(questionId) {
 }
 
 
-// 删除题目管理
-export function submit(data) {
+// 运行代码
+export function runCode(data) {
   return request({
     url: '/system/submitLog/runCode',
+    method: 'post',
+    data: data
+  })
+}
+
+
+// 提交记录
+export function submit(data) {
+  return request({
+    url: '/system/submitLog/submit',
     method: 'post',
     data: data
   })

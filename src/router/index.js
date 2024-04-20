@@ -172,7 +172,7 @@ export const dynamicRoutes = [
         path: 'index/:questionId(\\d+)',
         component: () => import('@/views/system/question/doQuestion.vue'),
         name: 'DoQuestion',
-        meta: { title: '做题页面', activeMenu: '/lesson' }
+        meta: { title: '做题页面', activeMenu: '/myCourseStu' }
       }
     ]
   },
