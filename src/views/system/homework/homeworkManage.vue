@@ -111,6 +111,11 @@
             </el-table-column>
             <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
               <template slot-scope="scope">
+                <router-link :to="'/system/submitLogList/index/' + scope.row.homeworkId + '/' + lessonId"
+                             class="link-type"
+                >
+                  <el-link>查看完成情况</el-link>
+                </router-link>
                 <el-button
                   size="mini"
                   type="text"

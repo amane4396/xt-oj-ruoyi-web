@@ -96,7 +96,7 @@
               width="1000"
               trigger="click"
             >
-              <el-input type="textarea" v-model="scope.row.code" :rows="5"></el-input>
+              <el-input type="textarea" v-model="scope.row.code" :rows="10"></el-input>
               <el-button slot="reference">查看代码</el-button>
             </el-popover>
           </template>
@@ -114,7 +114,7 @@ import {
   runCode,
   submit
 } from '@/api/system/question'
-import { listByQuestionId } from '@/api/system/submitLog'
+import { listByQuestionId, list, listForStu } from '@/api/system/submitLog'
 import CodeEditor from '@/components/CodeEditor/CodeEditor.vue'
 
 export default {
@@ -210,6 +210,7 @@ export default {
         questionId: null
       },
       questionId: null,
+      homeworkId: null,
       submitLogs: [],
       prettierOptions: {
         // prettier options here, e.g.:
@@ -221,6 +222,7 @@ export default {
   },
   created() {
     this.questionId = this.$route.params.questionId
+    this.homeworkId = this.$route.params.homeworkId
     this.getQuestionById()
   },
   methods: {
@@ -262,15 +264,25 @@ export default {
     doSubmit() {
       this.submitForm.code = this.$refs.monaco.getVal()
       this.submitForm.questionId = this.questionId
+      this.submitForm.homeworkId = this.homeworkId
       submit(this.submitForm).then((res) => {
-        console.log(res)
+        if (res.code === 200) {
+          this.$message({
+            message: '提交成功',
+            type: 'success'
+          })
+        }
       }).catch((err) => {
+        this.$message({
+          message: '提交失败',
+          type: 'danger'
+        })
       })
     },
     // 查看提交记录
     listSubmitLogs() {
       this.submitLogsDrawer = true
-      listByQuestionId(this.questionId).then((res) => {
+      listForStu({ questionId: this.questionId, homeworkId: this.homeworkId }).then((res) => {
         console.log(res)
         this.submitLogs = res.data
       }).catch((err) => {

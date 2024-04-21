@@ -169,10 +169,38 @@ export const dynamicRoutes = [
     roles: ['student', 'admin', 'teacher'],
     children: [
       {
-        path: 'index/:questionId(\\d+)',
+        path: 'index/:questionId(\\d+)/:homeworkId(\\d+)',
         component: () => import('@/views/system/question/doQuestion.vue'),
         name: 'DoQuestion',
         meta: { title: '做题页面', activeMenu: '/myCourseStu' }
+      }
+    ]
+  },
+  {
+    path: '/system/submitLogList',
+    component: Layout,
+    hidden: true,
+    roles: ['admin', 'teacher'],
+    children: [
+      {
+        path: 'index/:homeworkId(\\d+)/:lessonId(\\d+)', // 修改路径，添加lessonId参数
+        component: () => import('@/views/system/homework/submitLogList.vue'),
+        name: 'submitLogList',
+        meta: { title: '作业完成情况', activeMenu: '/myCourse' }
+      }
+    ]
+  },
+  {
+    path: '/system/correctPage',
+    component: Layout,
+    hidden: true,
+    roles: ['admin', 'teacher'],
+    children: [
+      {
+        path: 'index/:homeworkId(\\d+)/:studentId(\\d+)', // 修改路径，添加lessonId参数
+        component: () => import('@/views/system/homework/correctPage.vue'),
+        name: 'correctPage',
+        meta: { title: '批改作业', activeMenu: '/myCourse' }
       }
     ]
   },

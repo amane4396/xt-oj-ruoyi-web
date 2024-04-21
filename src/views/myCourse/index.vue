@@ -35,9 +35,9 @@
           <router-link :to="'/system/lesson-homeworkManage/index/' + scope.row.lessonId" class="link-type">
             <el-link type="primary">作业管理</el-link>
           </router-link>
-          <router-link :to="'/system/lesson-homeworkManage/index/' + scope.row.lessonId" class="link-type">
-            <el-link type="primary">查看作业</el-link>
-          </router-link>
+<!--          <router-link :to="'/system/lesson-homeworkManage/index/' + scope.row.lessonId" class="link-type">-->
+<!--            <el-link type="primary">查看作业</el-link>-->
+<!--          </router-link>-->
         </template>
       </el-table-column>
     </el-table>

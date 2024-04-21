@@ -57,7 +57,9 @@
         <el-descriptions-item label="结束时间">{{ homeWorkDetail.endTime }}</el-descriptions-item>
       </el-descriptions>
       <h3>题目列表</h3>
-      <el-table border style="margin-top: 10px" v-loading="loading" :data="homeWorkDetail.questionList" @selection-change="handleSelectionChange">
+      <el-table border style="margin-top: 10px" v-loading="loading" :data="homeWorkDetail.questionList"
+                @selection-change="handleSelectionChange"
+      >
         <el-table-column label="题目名称" align="center" prop="name"/>
         <el-table-column label="题目难度等级" align="center" prop="difficultyLevel">
           <template slot-scope="scope">
@@ -68,7 +70,9 @@
         </el-table-column>
         <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
           <template slot-scope="scope">
-            <router-link :to="'/system/doQuestion/index/' + scope.row.questionId" class="link-type">
+            <router-link :to="'/system/doQuestion/index/' + scope.row.questionId + '/' +  homeWorkDetail.homeworkId"
+                         class="link-type"
+            >
               <el-link type="primary">做题</el-link>
             </router-link>
           </template>
